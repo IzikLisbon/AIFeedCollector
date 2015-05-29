@@ -18,6 +18,5 @@ namespace AIStoreCollection
         [XmlElement("updated", Namespace = "http://www.w3.org/2005/Atom")]
         public string updated { get; set; }
         public enclosure enclosure {get; set;}
-        
     }
 }

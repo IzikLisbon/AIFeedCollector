@@ -13,8 +13,8 @@ namespace AIStoreCollection
         public List<ReplyEntity> Replies { get; set; }
         public bool HasReplies { get; set; }
         public bool IsAnswerAccepted { get; set; }
-        public DateTime PostedOn { get; set; }
-        public DateTime LastUpdated { get; set; }
+        public string PostedOn { get; set; }
+        public string LastUpdated { get; set; }
 
         public ForumThreadEntity()
         {

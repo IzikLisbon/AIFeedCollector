@@ -15,6 +15,6 @@ namespace AIStoreCollection
         public string type { get; set; }
 
         [XmlAttribute]
-        public int lenth { get; set; }
+        public int length { get; set; }
     }
 }

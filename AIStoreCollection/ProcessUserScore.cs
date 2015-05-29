@@ -9,20 +9,44 @@ using HtmlAgilityPack;
 
 namespace AIStoreCollection.Processor
 {
-    public class UserScore
+    public class ProcessUserScore
     {
-        private ThreadInfo thread;
-        
-        public UserScore(ThreadInfo threadInfo)
-        {   
-            this.thread = threadInfo;
+        private List<ForumThreadEntity> Threads { get; set; }
+        public Dictionary<string, int> UsersScore { get; set; }
+
+        public ProcessUserScore(List<ForumThreadEntity> threads)
+        {
+            this.Threads = threads;
+            this.UsersScore = new Dictionary<string, int>();
         }
 
         public void Process()
         {
-            foreach (HtmlReply reply in this.thread.htmlModel.Replies)
+            foreach (ForumThreadEntity forumThreadEntity in this.Threads)
             {
-                //if (reply.)
+                foreach (ReplyEntity reply in forumThreadEntity.Replies)
+                {
+                    //if (!reply.IsAuthorMicrosoftEmploee)
+                    //{
+                    //    continue;
+                    //}
+
+                    if (!this.UsersScore.ContainsKey(reply.AuthorName))
+                    {
+                        this.UsersScore[reply.AuthorName] = 0;
+                    }
+
+                    int authorScore = this.UsersScore[reply.AuthorName];
+
+                    authorScore += 1;
+                    authorScore += reply.VoteUps;
+                    if (reply.MarkedAsAnswer)
+                    {
+                        authorScore += 5;
+                    }
+
+                    this.UsersScore[reply.AuthorName] = authorScore;
+                }
             }
         }
     }

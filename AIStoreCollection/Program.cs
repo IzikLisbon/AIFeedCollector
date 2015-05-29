@@ -1,25 +1,7 @@
-﻿using Microsoft.Azure.WebJobs;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Storage.Blob;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.Drawing;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.WindowsAzure.Storage.Table;
-using System.Net.Http;
-using System.Reflection;
-using System.Linq.Expressions;
-using System.Xml;
-using System.Xml.Serialization;
 using AIStoreCollection;
-using AIStoreCollection.RssModel;
 using AIStoreCollection.HtmlModel;
-using HtmlAgilityPack;
 using AIStoreCollection.Processor;
 
 namespace AIRssCollection
@@ -32,10 +14,52 @@ namespace AIRssCollection
             //host.RunAndBlock();
             
             List<ThreadInfo> threads = DownloadAndParse.StartAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            
+            List<ForumThreadEntity> threadsTable = new List<ForumThreadEntity>();
+
+            UpdateThreadsTable(threads, threadsTable);
+
+            ProcessUserScore processUserScore = new ProcessUserScore(threadsTable);
+            processUserScore.Process();
+            var a = processUserScore.UsersScore;
+        }
+
+        private static void UpdateThreadsTable(List<ThreadInfo> threads, List<ForumThreadEntity> threadsTable)
+        {
             foreach (ThreadInfo thread in threads)
             {
-                UserScore processUserScore = new UserScore(thread);
+                ForumThreadEntity threadEntity = new ForumThreadEntity();
+                threadEntity.Id = thread.Rss.channel.id;
+                threadEntity.HasReplies = thread.htmlModel.Replies.Count > 0;
+                threadEntity.IsAnswerAccepted = thread.htmlModel.Replies.Any((reply) => reply.MarkedAsAnswer);
+                threadEntity.LastUpdated = thread.Rss.channel.lastBuildDate;
+                threadEntity.PostedOn = thread.Rss.channel.items.First().pubDate;
+                threadEntity.Path = thread.Rss.channel.link.href;
+
+                foreach (HtmlReply htmlReply in thread.htmlModel.Replies)
+                {
+                    ReplyEntity reply = new ReplyEntity();
+                    reply.AuthorId = htmlReply.AuthorId;
+                    reply.IsAuthorMicrosoftEmploee = htmlReply.IsAuthorMicrosoftEmploee;
+                    reply.MarkedAsAnswer = htmlReply.MarkedAsAnswer;
+                    reply.VoteUps = htmlReply.VoteUps;
+                    rssItem item = thread.Rss.channel.items.FirstOrDefault((rssItem) =>
+                    {
+                        return rssItem.guid.Contains(htmlReply.Id);
+                    });
+                    if (item != null)
+                    {
+                        reply.AuthorName = item.author.name;
+                    }
+                    threadEntity.Replies.Add(reply);
+                }
+
+                ForumThreadEntity existingThreadEntity = threadsTable.FirstOrDefault((t) => t.Id == threadEntity.Id);
+                if (existingThreadEntity != null)
+                {
+                    threadsTable.Remove(existingThreadEntity);
+                }
+
+                threadsTable.Add(threadEntity);
             }
         }
     }

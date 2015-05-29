@@ -13,5 +13,7 @@ namespace AIStoreCollection.HtmlModel
 
         public int VoteUps { get; set; }
         public bool MarkedAsAnswer { get; set; }
+
+        public string Id { get; set; }
     }
 }

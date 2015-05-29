@@ -32,24 +32,16 @@ namespace AIStoreCollection
                 Task<rss> rssTask = ReadRss(uri);
                 Task<string> htmlTask = ReadHtml(item.link);
                 
-                Task collectThreadTask = Task.WhenAll(rssTask, htmlTask);
-                tasks.Add(collectThreadTask);
-                collectThreadTask.ContinueWith((results) =>
+                Task.WaitAll(rssTask, htmlTask);
+                
+                threadList.Add(new ThreadInfo()
                 {
-                    lock (aiRss)
-                    {
-                        threadList.Add(new ThreadInfo()
-                        {
-                            ThreadItemInRootRss = item,
-                            Rss = rssTask.Result,
-                            html = htmlTask.Result,
-                            htmlModel = ParseHtml(htmlTask.Result)
-                        });
-                    }
+                    ThreadItemInRootRss = item,
+                    Rss = rssTask.Result,
+                    html = htmlTask.Result,
+                    htmlModel = ParseHtml(htmlTask.Result)
                 });
             }
-
-            Task.WaitAll(tasks.ToArray());
 
             return threadList;
         }
@@ -69,8 +61,15 @@ namespace AIStoreCollection
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
 
+            // get the replies section (skipping original quesion and answered questions. Answered questions are anyway duplicated in the allReplies section).
+            HtmlNode allReplies = doc.DocumentNode.Descendants("div").Where(x => HasCssId(x, "allReplies")).FirstOrDefault();
+            if (allReplies == null)
+            {
+                return htmlThread;
+            }
+
             // class="message " or class="message  answer"
-            IEnumerable<HtmlNode> links = doc.DocumentNode.Descendants("li").Where(x => HasCssClass(x, "message ") || HasCssClass(x, "message  answer"));
+            IEnumerable<HtmlNode> links = allReplies.Descendants("li").Where(x => HasCssClass(x, "message ") || HasCssClass(x, "message  answer"));
 
             foreach (HtmlNode message in links)
             {
@@ -78,6 +77,7 @@ namespace AIStoreCollection
 
                 // is reply marked as answer
                 reply.MarkedAsAnswer = message.Attributes["class"].Value == "message  answer";
+                reply.Id = message.Attributes["id"].Value;
 
                 // number of votes
                 HtmlNode voteNumber = message.Descendants("div").Where(x => HasCssClass(x, "votenumber")).FirstOrDefault();
@@ -117,6 +117,12 @@ namespace AIStoreCollection
         private static bool HasCssClass(HtmlNode node, string cssValue)
         {
             var cssAttribute = node.Attributes["class"];
+            return cssAttribute != null && cssAttribute.Value == cssValue;
+        }
+
+        private static bool HasCssId(HtmlNode node, string cssValue)
+        {
+            var cssAttribute = node.Attributes["id"];
             return cssAttribute != null && cssAttribute.Value == cssValue;
         }
 
