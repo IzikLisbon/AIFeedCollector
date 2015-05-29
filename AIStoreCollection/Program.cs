@@ -20,6 +20,7 @@ using AIStoreCollection;
 using AIStoreCollection.RssModel;
 using AIStoreCollection.HtmlModel;
 using HtmlAgilityPack;
+using AIStoreCollection.Processor;
 
 namespace AIRssCollection
 {
@@ -31,11 +32,10 @@ namespace AIRssCollection
             //host.RunAndBlock();
             
             List<ThreadInfo> threads = DownloadAndParse.StartAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            List<ThreadSummery> threadSummeryList = new List<ThreadSummery>();
-
+            
             foreach (ThreadInfo thread in threads)
             {
-                ProcessUserScore processUserScore = new ProcessUserScore(thread);
+                UserScore processUserScore = new UserScore(thread);
             }
         }
     }

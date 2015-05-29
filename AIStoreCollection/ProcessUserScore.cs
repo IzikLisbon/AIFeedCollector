@@ -22,7 +22,7 @@ namespace AIStoreCollection.Processor
         {
             foreach (HtmlReply reply in this.thread.htmlModel.Replies)
             {
-                if (reply.)
+                //if (reply.)
             }
         }
     }
