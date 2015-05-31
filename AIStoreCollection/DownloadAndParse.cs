@@ -75,7 +75,7 @@ namespace AIStoreCollection
             {
                 var reply = new HtmlReply();
 
-                // is reply marked as answer
+                // is replies marked as answer
                 reply.MarkedAsAnswer = message.Attributes["class"].Value == "message  answer";
                 reply.Id = message.Attributes["id"].Value;
 
@@ -105,7 +105,7 @@ namespace AIStoreCollection
                 HtmlNode affliationNode = message.Descendants("div").Where(x => HasCssClass(x, "profile-mini-affiliations")).FirstOrDefault();
                 if (affliationNode != null)
                 {   
-                    reply.IsAuthorMicrosoftEmploee = affliationNode.InnerHtml.Contains("MSFT");
+                    reply.IsAffiliatedToMicrosoft = affliationNode.InnerHtml.Contains("MSFT");
                 }
 
                 htmlThread.Replies.Add(reply);

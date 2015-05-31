@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Windows.Forms;
 using AIStoreCollection.HtmlModel;
+using AIStoreCollection.AzureTableStorageEntities;
 using CsQuery;
 using HtmlAgilityPack;
 
@@ -24,9 +27,10 @@ namespace AIStoreCollection.Processor
         {
             foreach (ForumThreadEntity forumThreadEntity in this.Threads)
             {
-                foreach (ReplyEntity reply in forumThreadEntity.Replies)
-                {
-                    //if (!reply.IsAuthorMicrosoftEmploee)
+                List<ReplyEntity> replies = ReplyEntitiesJsonSerializer.Deserialize(forumThreadEntity.Replies);
+                foreach (ReplyEntity reply in replies)
+                {   
+                    //if (!replies.IsAffiliatedToMicrosoft)
                     //{
                     //    continue;
                     //}

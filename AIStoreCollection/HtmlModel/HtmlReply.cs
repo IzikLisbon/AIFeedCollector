@@ -9,9 +9,10 @@ namespace AIStoreCollection.HtmlModel
     {
         public string AuthorId { get; set; }
 
-        public bool IsAuthorMicrosoftEmploee { get; set; } 
+        public bool IsAffiliatedToMicrosoft { get; set; } 
 
         public int VoteUps { get; set; }
+
         public bool MarkedAsAnswer { get; set; }
 
         public string Id { get; set; }
