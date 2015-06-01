@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace AIStoreCollection.AzureTableStorageEntities
+namespace AIFeed.AzureTableStorageEntities
 {
     public class ForumThreadEntity : TableEntity
     {

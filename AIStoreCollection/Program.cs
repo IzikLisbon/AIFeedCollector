@@ -4,8 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization.Json;
 using AIStoreCollection;
 using AIStoreCollection.HtmlModel;
-using AIStoreCollection.Processor;
-using AIStoreCollection.AzureTableStorageEntities;
+using AIFeed.AzureTableStorageEntities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
@@ -74,7 +73,9 @@ namespace AIRssCollection
                     if (item != null)
                     {
                         reply.AuthorName = item.author.name;
-                        reply.IsAuthorMicrosoftEmploee = reply.IsAuthorMicrosoftEmploee || item.author.name.IndexOf("MSFT", StringComparison.OrdinalIgnoreCase) > 0;
+                        reply.IsAuthorMicrosoftEmploee = reply.IsAuthorMicrosoftEmploee
+                            || item.author.name.IndexOf("MSFT", StringComparison.OrdinalIgnoreCase) >= 0
+                            || item.author.name.IndexOf("Izik Lisbon", StringComparison.OrdinalIgnoreCase) >= 0;
                     }
 
                     replies.Add(reply);

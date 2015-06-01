@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace AIStoreCollection.AzureTableStorageEntities
+namespace AIFeed.AzureTableStorageEntities
 {
     [DataContract]
     public class ReplyEntity

@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Windows.Forms;
-using AIStoreCollection.HtmlModel;
-using AIStoreCollection.AzureTableStorageEntities;
-using CsQuery;
-using HtmlAgilityPack;
+﻿using System.Collections.Generic;
+using AIFeed.AzureTableStorageEntities;
 
-namespace AIStoreCollection.Processor
+namespace AIFeedStat.StatisticsCalculators
 {
     public class ProcessUserScore
     {
-        private List<ForumThreadEntity> Threads { get; set; }
-        public Dictionary<string, int> UsersScore { get; set; }
+        private IEnumerable<ForumThreadEntity> Threads { get; set; }
+        private Dictionary<string, int> UsersScore { get; set; }
+        public List<UserScore> UserScoreList { get; set; }
 
-        public ProcessUserScore(List<ForumThreadEntity> threads)
+        public ProcessUserScore(IEnumerable<ForumThreadEntity> threads)
         {
             this.Threads = threads;
             this.UsersScore = new Dictionary<string, int>();
@@ -29,11 +21,11 @@ namespace AIStoreCollection.Processor
             {
                 List<ReplyEntity> replies = ReplyEntitiesJsonSerializer.Deserialize(forumThreadEntity.Replies);
                 foreach (ReplyEntity reply in replies)
-                {   
-                    //if (!replies.IsAffiliatedToMicrosoft)
-                    //{
-                    //    continue;
-                    //}
+                {
+                    if (!reply.IsAuthorMicrosoftEmploee)
+                    {
+                        continue;
+                    }
 
                     if (!this.UsersScore.ContainsKey(reply.AuthorName))
                     {
@@ -51,6 +43,12 @@ namespace AIStoreCollection.Processor
 
                     this.UsersScore[reply.AuthorName] = authorScore;
                 }
+            }
+
+            this.UserScoreList = new List<UserScore>();
+            foreach (var keyAndValue in UsersScore)
+            {
+                this.UserScoreList.Add(new UserScore { AuthorName = keyAndValue.Key, Score = keyAndValue.Value });
             }
         }
     }

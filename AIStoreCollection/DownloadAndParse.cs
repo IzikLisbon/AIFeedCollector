@@ -104,8 +104,8 @@ namespace AIStoreCollection
                 // Is Author Microsoft Employee
                 HtmlNode affliationNode = message.Descendants("div").Where(x => HasCssClass(x, "profile-mini-affiliations")).FirstOrDefault();
                 if (affliationNode != null)
-                {   
-                    reply.IsAffiliatedToMicrosoft = affliationNode.InnerHtml.Contains("MSFT");
+                {
+                    reply.IsAffiliatedToMicrosoft = affliationNode.InnerHtml.Contains("MSFT") || affliationNode.InnerHtml.Contains("Microsoft");
                 }
 
                 htmlThread.Replies.Add(reply);
