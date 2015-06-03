@@ -1,0 +1,49 @@
+﻿
+@{
+    
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="~/content/site.css">
+</head>
+<body>
+    <table>
+        <tr>
+            <td>
+                <b>Threads with a reply</b><br />
+                <svg id="repliedThreads" width="200" height="200"></svg>
+            </td>
+            <td>
+                <b>Threads Marked As Answered</b><br />
+                <svg id="answeredThreads" width="200" height="200"></svg>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="userScore"></div>
+            </td>
+        </tr>
+    </table>
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="~/scripts/loadUserScoreBar.js"></script>
+    <script src="~/scripts/liquidFillGauge.js"></script>
+
+    <script language="JavaScript">
+        loadLiquidFillGauge("repliedThreads", @ViewBag.RepliedPercentage);
+
+        var config1 = liquidFillGaugeDefaultSettings();
+        config1.circleColor = "#FF7777";
+        config1.textColor = "#FF4444";
+        config1.waveTextColor = "#FFAAAA";
+        config1.waveColor = "#FFDDDD";
+        config1.circleThickness = 0.2;
+        config1.textVertPosition = 0.2;
+        config1.waveAnimateTime = 1000;
+        loadLiquidFillGauge("answeredThreads", @ViewBag.AnsweredPercentage, config1);
+    </script>
+</body>
