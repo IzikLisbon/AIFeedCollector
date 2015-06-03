@@ -31,6 +31,9 @@ namespace AIFeedStat.Controllers
 
         public ActionResult Dashboard()
         {
+            ViewBag.RepliedPercentage = MvcApplication.PercentageOfRepliedThreads;
+            ViewBag.AnsweredPercentage = MvcApplication.PercentageOfAcceptedAsAnswerThreads;
+
             return View();
         }
 

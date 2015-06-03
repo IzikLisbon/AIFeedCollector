@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -15,8 +16,10 @@ namespace AIFeedStat
 {
     public class MvcApplication : System.Web.HttpApplication
     {
-        public static IReadOnlyList<ForumThreadEntity> ForumThread { get; private set; }
+        public static IReadOnlyList<ForumThreadEntity> ForumThreads { get; private set; }
         public static List<UserScore> UserScore { get; private set; }
+        public static int PercentageOfRepliedThreads { get; private set; }
+        public static int PercentageOfAcceptedAsAnswerThreads { get; private set; }
         
         protected void Application_Start()
         {
@@ -28,7 +31,7 @@ namespace AIFeedStat
             InitializeStorage();
         }
 
-        private void InitializeStorage()
+        private async void InitializeStorage()
         {
             // Open storage account using credentials from .cscfg file.
             string webJobStorageConnectionString = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ToString();
@@ -40,11 +43,21 @@ namespace AIFeedStat
             // Create the table if it doesn't exist. 
             CloudTable table = tableClient.GetTableReference("ForumThreadsSummery");
 
-            ForumThread = table.CreateQuery<ForumThreadEntity>().ToList();
+            ForumThreads = table.CreateQuery<ForumThreadEntity>().ToList();
 
-            ProcessUserScore userScore = new ProcessUserScore(ForumThread);
+            ProcessUserScore userScore = new ProcessUserScore(ForumThreads);
             userScore.Process();
             UserScore = userScore.UserScoreList;
+
+            int repliedCount = ForumThreads.Count((thread) => thread.HasReplies);
+            int answeredCount = ForumThreads.Count((thread) => thread.IsAnswerAccepted);
+            
+            PercentageOfRepliedThreads = (int)(((double)repliedCount / (double)ForumThreads.Count) * 100);
+            PercentageOfAcceptedAsAnswerThreads = (int)(((double)answeredCount / (double)ForumThreads.Count) * 100);
+
+            // call this method every 3 hours.
+            await Task.Delay(TimeSpan.FromHours(2));
+            InitializeStorage();
         }
     }
 }
