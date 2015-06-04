@@ -74,8 +74,7 @@ namespace AIRssCollection
                     {
                         reply.AuthorName = item.author.name;
                         reply.IsAuthorMicrosoftEmploee = reply.IsAuthorMicrosoftEmploee
-                            || item.author.name.IndexOf("MSFT", StringComparison.OrdinalIgnoreCase) >= 0
-                            || item.author.name.IndexOf("Izik Lisbon", StringComparison.OrdinalIgnoreCase) >= 0;
+                            || item.author.name.IndexOf("MSFT", StringComparison.OrdinalIgnoreCase) >= 0;
                     }
 
                     replies.Add(reply);

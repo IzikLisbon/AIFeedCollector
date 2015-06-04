@@ -107,6 +107,11 @@ namespace AIStoreCollection
                 {
                     reply.IsAffiliatedToMicrosoft = affliationNode.InnerHtml.Contains("MSFT") || affliationNode.InnerHtml.Contains("Microsoft");
                 }
+                affliationNode = message.Descendants("abbr").Where(x => HasCssClass(x, "affil")).FirstOrDefault();
+                if (affliationNode != null)
+                {
+                    reply.IsAffiliatedToMicrosoft = reply.IsAffiliatedToMicrosoft || affliationNode.InnerHtml.Contains("Microsoft");
+                }
 
                 htmlThread.Replies.Add(reply);
             }
