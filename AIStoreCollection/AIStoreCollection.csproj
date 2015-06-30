@@ -89,7 +89,6 @@
     <Compile Include="RssModel\item.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MicrosoftEmployee.cs" />
     <Compile Include="RssModel\link.cs" />
     <Compile Include="RssModel\rss.cs" />
     <Compile Include="ThreadInfo.cs" />

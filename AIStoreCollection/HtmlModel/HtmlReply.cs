@@ -7,14 +7,16 @@ namespace AIStoreCollection.HtmlModel
 {
     public class HtmlReply
     {
+        public string Id { get; set; }
+
         public string AuthorId { get; set; }
 
-        public bool IsAffiliatedToMicrosoft { get; set; } 
+        public string AuthorName { get; set; }
+
+        public string Affiliation { get; set; } 
 
         public int VoteUps { get; set; }
 
         public bool MarkedAsAnswer { get; set; }
-
-        public string Id { get; set; }
     }
 }

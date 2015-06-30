@@ -16,11 +16,58 @@ namespace AIRssCollection
         static void Main(string[] args)
         {   
             JobHost host = new JobHost();
-            host.Call(typeof(Program).GetMethod("UpdateForumData"));
+            //host.Call(typeof(Program).GetMethod("UpdateForumData"));
 
-            //ProcessUserScore processUserScore = new ProcessUserScore(threadsTable);
-            //processUserScore.Process();
-            //var a = processUserScore.UsersScore;
+            // uncomment this line to update all the threads in the CloudTable. 
+            host.Call(typeof(Program).GetMethod("ReUpdateExistingFeeds"));
+        }
+
+        [NoAutomaticTrigger]
+        public static void ReUpdateExistingFeeds(
+            [Table("ForumThreadsSummery")] CloudTable cloudTable)
+        {
+            // Uncomment to update a specific thread 
+            //var query = TableOperation.Retrieve<ForumThreadEntity>("1", "45224325-0593-40cf-a4b6-5f4408bc93a3");
+            //IEnumerable<ForumThreadEntity> list = new List<ForumThreadEntity>() { cloudTable.Execute(query).Result as ForumThreadEntity };
+
+            // If previous 2 lines are uncomment - comment those 2 lines instead
+            var query = new TableQuery<ForumThreadEntity>();
+            IEnumerable<ForumThreadEntity> list = cloudTable.ExecuteQuery(query);
+
+            foreach (ForumThreadEntity forumThread in list)
+            {
+                HtmlThread htmlThread = DownloadAndParse.ParseHtmlOnly(forumThread.Path);
+                forumThread.HasReplies = htmlThread.Replies.Count > 0;
+                forumThread.IsAnswerAccepted = htmlThread.Replies.Any((reply) => reply.MarkedAsAnswer);
+                forumThread.Replies = RepliesToJson(htmlThread.Replies);
+
+                TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(forumThread);
+                TableResult res = cloudTable.Execute(insertOrReplaceOperation);
+                System.Console.WriteLine(res.HttpStatusCode);
+            }
+        }
+
+        private static string RepliesToJson(IEnumerable<HtmlReply> htmlReplies)
+        {
+            var replies = new List<ReplyEntity>();
+            foreach (HtmlReply htmlReply in htmlReplies)
+            {
+                ReplyEntity reply = new ReplyEntity();
+                reply.Id = htmlReply.Id;
+                reply.AuthorId = htmlReply.AuthorId;
+                reply.AuthorName = htmlReply.AuthorName;
+                reply.IsAuthorMicrosoftEmploee = 
+                    (htmlReply.Affiliation != null && 
+                    (htmlReply.Affiliation.Contains("MSFT") || 
+                    htmlReply.Affiliation.Contains("Microsoft"))) || 
+                    htmlReply.AuthorName.Contains("MSFT");
+                reply.MarkedAsAnswer = htmlReply.MarkedAsAnswer;
+                reply.VoteUps = htmlReply.VoteUps;
+
+                replies.Add(reply);
+            }
+
+            return ReplyEntitiesJsonSerializer.Serialize(replies);
         }
 
         [NoAutomaticTrigger]
@@ -57,30 +104,8 @@ namespace AIRssCollection
                 threadEntity.LastUpdated = thread.Rss.channel.lastBuildDate;
                 threadEntity.PostedOn = thread.Rss.channel.items.First().pubDate;
                 threadEntity.Path = thread.Rss.channel.link.href;
+                threadEntity.Replies = RepliesToJson(thread.htmlModel.Replies); ;
 
-                var replies = new List<ReplyEntity>();
-                foreach (HtmlReply htmlReply in thread.htmlModel.Replies)
-                {
-                    ReplyEntity reply = new ReplyEntity();
-                    reply.AuthorId = htmlReply.AuthorId;
-                    reply.IsAuthorMicrosoftEmploee = htmlReply.IsAffiliatedToMicrosoft;
-                    reply.MarkedAsAnswer = htmlReply.MarkedAsAnswer;
-                    reply.VoteUps = htmlReply.VoteUps;
-                    rssItem item = thread.Rss.channel.items.FirstOrDefault((rssItem) =>
-                    {
-                        return rssItem.guid.Contains(htmlReply.Id);
-                    });
-                    if (item != null)
-                    {
-                        reply.AuthorName = item.author.name;
-                        reply.IsAuthorMicrosoftEmploee = reply.IsAuthorMicrosoftEmploee
-                            || item.author.name.IndexOf("MSFT", StringComparison.OrdinalIgnoreCase) >= 0;
-                    }
-
-                    replies.Add(reply);
-                }
-
-                threadEntity.Replies = ReplyEntitiesJsonSerializer.Serialize(replies);
                 threadsTable.Add(threadEntity);
             }
 

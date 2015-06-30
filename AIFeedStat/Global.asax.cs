@@ -20,6 +20,7 @@ namespace AIFeedStat
         public static List<UserScore> UserScore { get; private set; }
         public static int PercentageOfRepliedThreads { get; private set; }
         public static int PercentageOfAcceptedAsAnswerThreads { get; private set; }
+        public static int TotalThreads { get; set; }
         
         protected void Application_Start()
         {
@@ -54,6 +55,7 @@ namespace AIFeedStat
             
             PercentageOfRepliedThreads = (int)(((double)repliedCount / (double)ForumThreads.Count) * 100);
             PercentageOfAcceptedAsAnswerThreads = (int)(((double)answeredCount / (double)ForumThreads.Count) * 100);
+            TotalThreads = ForumThreads.Count();
 
             // call this method every 3 hours.
             await Task.Delay(TimeSpan.FromHours(2));

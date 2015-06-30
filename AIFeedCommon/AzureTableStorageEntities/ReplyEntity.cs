@@ -20,5 +20,7 @@ namespace AIFeed.AzureTableStorageEntities
         public int VoteUps { get; set; }
         [DataMember]
         public bool MarkedAsAnswer { get; set; }
+        [DataMember]
+        public string Id { get; set; }
     }
 }

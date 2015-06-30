@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,12 +47,15 @@ namespace AIStoreCollection
             return threadList;
         }
 
-        private async static Task<bool> IsMicrosoftEmploee(string userUrl)
+        /// <summary>
+        /// Downlaod the HTML from the url and parse it into an HtmlThread object.
+        /// </summary>
+        public static HtmlThread ParseHtmlOnly(string url)
         {
-            HttpClient client = new HttpClient();
-            string html = await client.GetStringAsync(userUrl);
+            string html = ReadHtml(url).GetAwaiter().GetResult();
+            HtmlThread htmlThread = ParseHtml(html);
 
-            return html.Contains("Microsoft Employee");
+            return htmlThread;
         }
 
         private static HtmlThread ParseHtml(string html)
@@ -65,11 +69,17 @@ namespace AIStoreCollection
             HtmlNode allReplies = doc.DocumentNode.Descendants("div").Where(x => HasCssId(x, "allReplies")).FirstOrDefault();
             if (allReplies == null)
             {
-                return htmlThread;
+                // If there is only one reply and it is answered, then it will not be under the All Replies section and under the Answered secion but only under the Answer section.
+                allReplies = doc.DocumentNode.Descendants("div").Where(x => HasCssId(x, "answers")).FirstOrDefault();
+
+                if (allReplies == null)
+                {
+                    return htmlThread;
+                }
             }
 
             // class="message " or class="message  answer"
-            IEnumerable<HtmlNode> links = allReplies.Descendants("li").Where(x => HasCssClass(x, "message ") || HasCssClass(x, "message  answer"));
+            IEnumerable<HtmlNode> links = allReplies.Descendants("li").Where(li => HasCssClass(li, "message ") || HasCssClass(li, "message  answer") || HasCssClass(li, "message  propose"));
 
             foreach (HtmlNode message in links)
             {
@@ -101,22 +111,84 @@ namespace AIStoreCollection
                     }
                 }
 
+                // User Name
+                reply.AuthorName = ReadAuthorName(message);
+
                 // Is Author Microsoft Employee
                 HtmlNode affliationNode = message.Descendants("div").Where(x => HasCssClass(x, "profile-mini-affiliations")).FirstOrDefault();
                 if (affliationNode != null)
                 {
-                    reply.IsAffiliatedToMicrosoft = affliationNode.InnerHtml.Contains("MSFT") || affliationNode.InnerHtml.Contains("Microsoft");
+                    reply.Affiliation = affliationNode.InnerHtml;
                 }
+
                 affliationNode = message.Descendants("abbr").Where(x => HasCssClass(x, "affil")).FirstOrDefault();
                 if (affliationNode != null)
                 {
-                    reply.IsAffiliatedToMicrosoft = reply.IsAffiliatedToMicrosoft || affliationNode.InnerHtml.Contains("Microsoft");
+                    reply.Affiliation = affliationNode.InnerHtml;
+                }
+
+                if (reply.Affiliation == null)
+                {
+                    HttpClient client = new HttpClient();
+                    string authorPaegHtml = client.GetStringAsync("https://social.msdn.microsoft.com/profile/" + reply.AuthorName).GetAwaiter().GetResult();
+
+                    if (authorPaegHtml.Contains("Microsoft Employee"))
+                    {
+                        reply.Affiliation = "Microsoft Employee";
+                    }
                 }
 
                 htmlThread.Replies.Add(reply);
             }
 
             return htmlThread;
+        }
+
+        private static string ReadAuthorName(HtmlNode message)
+        {
+            string authorName = null;
+
+            HtmlNode userSignature = message.Descendants("hr").Where(hr => HasCssClass(hr, "sig")).FirstOrDefault();
+            if (userSignature != null && !string.IsNullOrWhiteSpace(userSignature.InnerHtml))
+            {
+                authorName = userSignature.InnerHtml;
+            }
+
+            HtmlNode authorLink = message.Descendants("a").Where(a => HasCssClass(a, "author")).FirstOrDefault();
+            if (authorLink != null && authorName == null)
+            {
+                HtmlNode spanInAuthorLink = authorLink.Descendants("span").FirstOrDefault();
+                if (spanInAuthorLink != null && !string.IsNullOrWhiteSpace(spanInAuthorLink.InnerHtml))
+                {
+                    authorName = spanInAuthorLink.InnerHtml;
+                }
+            }
+
+            authorLink = message.Descendants("div").Where(div => HasCssClass(div, "unified-baseball-card-mini")).FirstOrDefault();
+            if (authorLink != null && authorName == null)
+            {
+                HtmlAttribute dataProfileUsercardCustomlinkAttribute = authorLink.Attributes.Where(attr => attr.Name == "data-profile-usercard-customlink").FirstOrDefault();
+                if (dataProfileUsercardCustomlinkAttribute != null && dataProfileUsercardCustomlinkAttribute.Value != null)
+                {
+                    int userNameStartIndex = dataProfileUsercardCustomlinkAttribute.Value.IndexOf("threads?user=");
+                    if (userNameStartIndex != -1)
+                    {
+                        userNameStartIndex += "threads?user=".Length;
+                        int userNameEndIndex = dataProfileUsercardCustomlinkAttribute.Value.IndexOf('"', userNameStartIndex);
+                        if (userNameEndIndex != -1)
+                        {
+                            authorName = dataProfileUsercardCustomlinkAttribute.Value.Substring(userNameStartIndex, userNameEndIndex - userNameStartIndex);
+                        }
+                    }
+                }
+            }
+
+            if (authorName != null)
+            {
+                authorName = WebUtility.UrlDecode(authorName);
+            }
+
+            return authorName;
         }
 
         private static bool HasCssClass(HtmlNode node, string cssValue)

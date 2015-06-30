@@ -1,13 +1,12 @@
-﻿
-@{
-    
+﻿@{  
     Layout = null;
 }
 
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Feeds Dashboard</title>
     <link rel="stylesheet" href="~/content/site.css">
 </head>
 <body>
@@ -17,17 +16,33 @@
                 <b>Threads with a reply</b><br />
                 <svg id="repliedThreads" width="200" height="200"></svg>
             </td>
+            <td class="spaceColumn">
+            </td>
             <td>
                 <b>Threads Marked As Answered</b><br />
                 <svg id="answeredThreads" width="200" height="200"></svg>
             </td>
-        </tr>
-        <tr>
-            <td>
-                <div id="userScore"></div>
+            <td style="width: 400px;">
             </td>
+            <td style="text-align: left">
+                <div style="font-size: 1.5em">Collection start date:</div>
+                <div style="font-size: 1.7em; font-weight: 600">June 1<sup>st</sup> 2015</div>
+
+                <br /><br />
+
+                <div style="font-size: 1.5em">Total Threads: </div>
+                <div style="font-size: 1.7em; font-weight: 600">@ViewBag.TotalThreads</div>
+        </td>
         </tr>
-    </table>
+        </table>
+        <table>
+            <tr>
+                <td>
+                    <div id="userScore"></div>
+                    <span class="watermark">Reply: 1 point &nbsp;&nbsp;&nbsp; Vote Up: 1 point &nbsp;&nbsp;&nbsp; Accepted Answer: 5 points</span>
+                </td>
+            </tr>
+        </table>
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="~/scripts/loadUserScoreBar.js"></script>
