@@ -1,6 +1,6 @@
 ﻿var margin = { top: 20, right: 20, bottom: 30, left: 40 },
     width = 1500 - margin.left - margin.right,
-    height = 700 - margin.top - margin.bottom;
+    height = 600 - margin.top - margin.bottom;
 
 var x = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1);
@@ -23,7 +23,7 @@ var svg = d3.select("#userScore").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.tsv("Home/UserScore", type, function (error, data) {
+d3.tsv("UserScore", type, function (error, data) {
     x.domain(data.map(function (d) { return d.authorName; }));
     y.domain([0, d3.max(data, function (d) { return d.score; })]);
 

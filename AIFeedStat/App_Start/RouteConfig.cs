@@ -14,6 +14,12 @@ namespace AIFeedStat
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                name: "UserScore",
+                url: "UserScore",
+                defaults: new { controller = "Home", action = "UserScore", id = UrlParameter.Optional }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Dashboard", id = UrlParameter.Optional }
