@@ -22,7 +22,7 @@ namespace AIStoreCollection
         public async static Task<List<ThreadInfo>> StartAsync()
         {
             List<ThreadInfo> threadList = new List<ThreadInfo>();
-            rss aiRss = await ReadRss("https://social.msdn.microsoft.com/Forums/en-US/ApplicationInsights/threads?outputAs=rss");
+            rss aiRss = await ReadRss("https://social.msdn.microsoft.com/Forums/en-US/ApplicationInsights/threads?outputAs=rss").ConfigureAwait(false);
             List<Task> tasks = new List<Task>();
 
             foreach (rssItem item in aiRss.channel.items)
@@ -130,11 +130,21 @@ namespace AIStoreCollection
                 if (reply.Affiliation == null)
                 {
                     HttpClient client = new HttpClient();
-                    string authorPaegHtml = client.GetStringAsync("https://social.msdn.microsoft.com/profile/" + reply.AuthorName).GetAwaiter().GetResult();
-
-                    if (authorPaegHtml.Contains("Microsoft Employee"))
+                    try
                     {
-                        reply.Affiliation = "Microsoft Employee";
+                        string authorPaegHtml = client.GetStringAsync("https://social.msdn.microsoft.com/profile/" + reply.AuthorName).GetAwaiter().GetResult();
+                        if (authorPaegHtml.Contains("Microsoft Employee"))
+                        {
+                            reply.Affiliation = "Microsoft Employee";
+                        }
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        // ignore http errors.
+                    }
+                    catch (WebException e)
+                    {
+                        // ignore http errors.
                     }
                 }
 
@@ -222,7 +232,7 @@ namespace AIStoreCollection
             try
             {
                 HttpClient client = new HttpClient();
-                Stream rssFeed = await client.GetStreamAsync(uri);
+                Stream rssFeed = await client.GetStreamAsync(uri).ConfigureAwait(false);
 
                 XmlSerializer serializer = new XmlSerializer(typeof(rss));
                 rss rss = serializer.Deserialize(rssFeed) as rss;

@@ -173,6 +173,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
     <Content Include="Views\Home\Dashboard.cshtml" />
+    <Content Include="Views\Home\ReloadData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -186,9 +187,9 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AIFeedCommon\AIFeedCommon.csproj">
+    <ProjectReference Include="..\AIFeed\AIFeed.csproj">
       <Project>{6d11e92c-a584-4bc0-b2ba-01e78f0fda34}</Project>
-      <Name>AIFeedCommon</Name>
+      <Name>AIFeed</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

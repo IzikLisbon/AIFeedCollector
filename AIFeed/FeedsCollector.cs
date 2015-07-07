@@ -5,26 +5,18 @@ using System.Runtime.Serialization.Json;
 using AIStoreCollection;
 using AIStoreCollection.HtmlModel;
 using AIFeed.AzureTableStorageEntities;
-using Microsoft.Azure.WebJobs;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
 
 namespace AIRssCollection
 {
-    public class Program
+    public class FeedsCollector
     {
-        static void Main(string[] args)
-        {   
-            JobHost host = new JobHost();
-            //host.Call(typeof(Program).GetMethod("UpdateForumData"));
-
-            // uncomment this line to update all the threads in the CloudTable. 
-            host.Call(typeof(Program).GetMethod("ReUpdateExistingFeeds"));
-        }
-
-        [NoAutomaticTrigger]
-        public static void ReUpdateExistingFeeds(
-            [Table("ForumThreadsSummery")] CloudTable cloudTable)
+        /// <summary>
+        /// Going over all the collected AI feeds and update thier statistics (by parsing the HTML) 
+        /// </summary>
+        /// <param name="cloudTable">The cloud table to query and update the Azure Table</param>
+        public static void IterateOverExistingFeeds(CloudTable cloudTable)
         {
             // Uncomment to update a specific thread 
             //var query = TableOperation.Retrieve<ForumThreadEntity>("1", "45224325-0593-40cf-a4b6-5f4408bc93a3");
@@ -47,32 +39,11 @@ namespace AIRssCollection
             }
         }
 
-        private static string RepliesToJson(IEnumerable<HtmlReply> htmlReplies)
-        {
-            var replies = new List<ReplyEntity>();
-            foreach (HtmlReply htmlReply in htmlReplies)
-            {
-                ReplyEntity reply = new ReplyEntity();
-                reply.Id = htmlReply.Id;
-                reply.AuthorId = htmlReply.AuthorId;
-                reply.AuthorName = htmlReply.AuthorName;
-                reply.IsAuthorMicrosoftEmploee = 
-                    (htmlReply.Affiliation != null && 
-                    (htmlReply.Affiliation.Contains("MSFT") || 
-                    htmlReply.Affiliation.Contains("Microsoft"))) || 
-                    htmlReply.AuthorName.Contains("MSFT");
-                reply.MarkedAsAnswer = htmlReply.MarkedAsAnswer;
-                reply.VoteUps = htmlReply.VoteUps;
-
-                replies.Add(reply);
-            }
-
-            return ReplyEntitiesJsonSerializer.Serialize(replies);
-        }
-
-        [NoAutomaticTrigger]
-        public static void UpdateForumData(
-            [Table("ForumThreadsSummery")] CloudTable cloudTable)
+        /// <summary>
+        /// Iterates over latest RSS feeds. 
+        /// </summary>
+        /// <param name="cloudTable">The cloud table to query and update the Azure Table</param>
+        public static void IterateOverRss(CloudTable cloudTable)
         {
             // Download the forum RSS and HTML and parse it. 
             List<ThreadInfo> rssAndHtml = DownloadAndParse.StartAsync().ConfigureAwait(false).GetAwaiter().GetResult();
@@ -87,6 +58,29 @@ namespace AIRssCollection
                 TableResult res = cloudTable.Execute(insertOrReplaceOperation);
                 System.Console.WriteLine(res.HttpStatusCode);
             }
+        }
+
+        private static string RepliesToJson(IEnumerable<HtmlReply> htmlReplies)
+        {
+            var replies = new List<ReplyEntity>();
+            foreach (HtmlReply htmlReply in htmlReplies)
+            {
+                ReplyEntity reply = new ReplyEntity();
+                reply.Id = htmlReply.Id;
+                reply.AuthorId = htmlReply.AuthorId;
+                reply.AuthorName = htmlReply.AuthorName;
+                reply.IsAuthorMicrosoftEmploee =
+                    (htmlReply.Affiliation != null &&
+                    (htmlReply.Affiliation.Contains("MSFT") ||
+                    htmlReply.Affiliation.Contains("Microsoft"))) ||
+                    htmlReply.AuthorName.Contains("MSFT");
+                reply.MarkedAsAnswer = htmlReply.MarkedAsAnswer;
+                reply.VoteUps = htmlReply.VoteUps;
+
+                replies.Add(reply);
+            }
+
+            return ReplyEntitiesJsonSerializer.Serialize(replies);
         }
 
         private static List<ForumThreadEntity> CreateTableStorageEntities(List<ThreadInfo> threads)

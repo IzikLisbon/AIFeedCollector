@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIStoreCollection", "AIStoreCollection\AIStoreCollection.csproj", "{AC822A24-7D4A-457C-BF4A-0728293734E4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIFeed.WebJobs", "AIFeed.WebJobs\AIFeed.WebJobs.csproj", "{AC822A24-7D4A-457C-BF4A-0728293734E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIFeedStat", "AIFeedStat\AIFeedStat.csproj", "{54A8B791-FD9A-4679-A5DB-F26E0FAB274C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIFeed.Site", "AIFeed.Site\AIFeed.Site.csproj", "{54A8B791-FD9A-4679-A5DB-F26E0FAB274C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublishScripts", "PublishScripts", "{003D5C56-2EE2-4A2F-AECB-D050A1AFC805}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configurations", "Configura
 		PublishScripts\Configurations\AIFeedStat-WAWS-dev.json = PublishScripts\Configurations\AIFeedStat-WAWS-dev.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIFeedCommon", "AIFeedCommon\AIFeedCommon.csproj", "{6D11E92C-A584-4BC0-B2BA-01E78F0FDA34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIFeed", "AIFeed\AIFeed.csproj", "{6D11E92C-A584-4BC0-B2BA-01E78F0FDA34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

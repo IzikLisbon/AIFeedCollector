@@ -57,7 +57,7 @@ namespace AIFeedStat
             PercentageOfAcceptedAsAnswerThreads = (int)(((double)answeredCount / (double)ForumThreads.Count) * 100);
             TotalThreads = ForumThreads.Count();
 
-            // call this method every 3 hours.
+            // call this method every 2 hours.
             await Task.Delay(TimeSpan.FromHours(2));
             InitializeStorage();
         }
