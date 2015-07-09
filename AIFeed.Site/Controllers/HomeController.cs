@@ -14,6 +14,8 @@ namespace AIFeedStat.Controllers
 {
     public class HomeController : Controller
     {
+        public static bool running = false;
+
         public ActionResult Dashboard()
         {
             ViewBag.RepliedPercentage = MvcApplication.PercentageOfRepliedThreads;
@@ -38,9 +40,7 @@ namespace AIFeedStat.Controllers
             return Content(content);
         }
 
-        public static bool running = false;
-
-        public ActionResult ReloadData()
+        public ActionResult ReloadData(bool all=false)
         {
             lock (this)
             {
@@ -64,8 +64,13 @@ namespace AIFeedStat.Controllers
                         CloudTable table = tableClient.GetTableReference("ForumThreadsSummery");
 
                         // // Iterate and update 
-                        AIRssCollection.FeedsCollector.IterateOverExistingFeeds(table);
+                        if (all)
+                        {
+                            AIRssCollection.FeedsCollector.IterateOverExistingFeeds(table);
+                        }
+
                         AIRssCollection.FeedsCollector.IterateOverRss(table);
+                        MvcApplication.RefreshFromStorage(table);
                     }
                     catch (Exception e)
                     {
