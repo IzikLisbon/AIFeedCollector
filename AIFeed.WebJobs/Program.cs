@@ -33,7 +33,7 @@ namespace AIFeedCollector.WebJobs
         [NoAutomaticTrigger]
         public static void IterateOverRss(
             [Table("ForumThreadsSummery")] CloudTable cloudTable)
-        {
+        {   
             FeedsCollector.IterateOverRss(cloudTable);
         }
     }

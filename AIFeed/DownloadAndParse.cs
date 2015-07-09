@@ -66,11 +66,11 @@ namespace AIStoreCollection
             doc.LoadHtml(html);
 
             // get the replies section (skipping original quesion and answered questions. Answered questions are anyway duplicated in the allReplies section).
-            HtmlNode allReplies = doc.DocumentNode.Descendants("div").Where(x => HasCssId(x, "allReplies")).FirstOrDefault();
+            HtmlNode allReplies = doc.DocumentNode.Descendants("div").Where(x => HasIdAttribute(x, "allReplies")).FirstOrDefault();
             if (allReplies == null)
             {
                 // If there is only one reply and it is answered, then it will not be under the All Replies section and under the Answered secion but only under the Answer section.
-                allReplies = doc.DocumentNode.Descendants("div").Where(x => HasCssId(x, "answers")).FirstOrDefault();
+                allReplies = doc.DocumentNode.Descendants("div").Where(x => HasIdAttribute(x, "answers")).FirstOrDefault();
 
                 if (allReplies == null)
                 {
@@ -122,7 +122,7 @@ namespace AIStoreCollection
                 }
 
                 affliationNode = message.Descendants("abbr").Where(x => HasCssClass(x, "affil")).FirstOrDefault();
-                if (affliationNode != null)
+                if (affliationNode != null && !string.IsNullOrWhiteSpace(affliationNode.InnerHtml))
                 {
                     reply.Affiliation = affliationNode.InnerHtml;
                 }
@@ -132,7 +132,7 @@ namespace AIStoreCollection
                     HttpClient client = new HttpClient();
                     try
                     {
-                        string authorPaegHtml = client.GetStringAsync("https://social.msdn.microsoft.com/profile/" + reply.AuthorName).GetAwaiter().GetResult();
+                        string authorPaegHtml = client.GetStringAsync("https://social.msdn.microsoft.com/profile/" + WebUtility.UrlEncode(reply.AuthorName)).GetAwaiter().GetResult();
                         if (authorPaegHtml.Contains("Microsoft Employee"))
                         {
                             reply.Affiliation = "Microsoft Employee";
@@ -164,17 +164,7 @@ namespace AIStoreCollection
                 authorName = userSignature.InnerHtml;
             }
 
-            HtmlNode authorLink = message.Descendants("a").Where(a => HasCssClass(a, "author")).FirstOrDefault();
-            if (authorLink != null && authorName == null)
-            {
-                HtmlNode spanInAuthorLink = authorLink.Descendants("span").FirstOrDefault();
-                if (spanInAuthorLink != null && !string.IsNullOrWhiteSpace(spanInAuthorLink.InnerHtml))
-                {
-                    authorName = spanInAuthorLink.InnerHtml;
-                }
-            }
-
-            authorLink = message.Descendants("div").Where(div => HasCssClass(div, "unified-baseball-card-mini")).FirstOrDefault();
+            HtmlNode authorLink = message.Descendants("div").Where(div => HasCssClass(div, "unified-baseball-card-mini")).FirstOrDefault();
             if (authorLink != null && authorName == null)
             {
                 HtmlAttribute dataProfileUsercardCustomlinkAttribute = authorLink.Attributes.Where(attr => attr.Name == "data-profile-usercard-customlink").FirstOrDefault();
@@ -207,10 +197,10 @@ namespace AIStoreCollection
             return cssAttribute != null && cssAttribute.Value == cssValue;
         }
 
-        private static bool HasCssId(HtmlNode node, string cssValue)
+        private static bool HasIdAttribute(HtmlNode node, string idValue)
         {
-            var cssAttribute = node.Attributes["id"];
-            return cssAttribute != null && cssAttribute.Value == cssValue;
+            var idAttribute = node.Attributes["id"];
+            return idAttribute != null && idAttribute.Value == idValue;
         }
 
         private static Task<string> ReadHtml(string uri)

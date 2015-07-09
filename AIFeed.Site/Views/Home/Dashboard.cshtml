@@ -11,19 +11,17 @@
 </head>
 <body>
     <table>
-        <tr>
+        <tr id ="rowWithFillGauges">
             <td>
                 <b>Threads with a reply</b><br />
                 <svg id="repliedThreads" width="170" height="170"></svg>
             </td>
-            <td class="spaceColumn">
-            </td>
+            <td class="spaceColumn"></td>
             <td>
                 <b>Threads Marked As Answered</b><br />
                 <svg id="answeredThreads" width="170" height="170"></svg>
             </td>
-            <td style="width: 400px;">
-            </td>
+            <td style="width: 400px;"></td>
             <td style="text-align: left">
                 <div style="font-size: 1.5em">Collection start date:</div>
                 <div style="font-size: 1.7em; font-weight: 600">June 1<sup>st</sup> 2015</div>
@@ -32,7 +30,7 @@
 
                 <div style="font-size: 1.5em">Total Threads: </div>
                 <div style="font-size: 1.7em; font-weight: 600">@ViewBag.TotalThreads</div>
-        </td>
+            </td>
         </tr>
         </table>
         <table>
@@ -45,6 +43,7 @@
         </table>
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="~/bundles/jquery"></script>
     <script src="~/scripts/loadUserScoreBar.js"></script>
     <script src="~/scripts/liquidFillGauge.js"></script>
 

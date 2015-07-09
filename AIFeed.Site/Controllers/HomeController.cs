@@ -35,7 +35,8 @@ namespace AIFeedStat.Controllers
                 sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}", userScore.AuthorName, userScore.Score));
             }
 
-            return Content(sb.ToString());
+            string content = sb.ToString();
+            return Content(content);
         }
 
         public static bool running = false;

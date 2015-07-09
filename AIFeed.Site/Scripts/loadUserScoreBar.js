@@ -1,7 +1,7 @@
 ﻿var showScoreBar = function () {
     var margin = { top: 120, right: 20, bottom: 30, left: 40 },
-        width = $("#rowWithFillGauges").width() - 100,
-        height = $("#rowWithFillGauges").height() * 3;
+        width = $("#rowWithFillGauges").width(),
+        height = 500;
 
     var x = d3.scale.ordinal()
         .rangeRoundBands([0, width], .1);
