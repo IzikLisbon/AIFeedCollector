@@ -21,7 +21,9 @@
                 <b>Threads Marked As Answered</b><br />
                 <svg id="answeredThreads" width="170" height="170"></svg>
             </td>
-            <td style="width: 400px;"></td>
+            <td style="width: 400px;">
+                @Html.ActionLink("Threads with no replies or unanswered replies", "UnReplied", "Home")
+            </td>
             <td style="text-align: left">
                 <div style="font-size: 1.5em">Collection start date:</div>
                 <div style="font-size: 1.7em; font-weight: 600">June 1<sup>st</sup> 2015</div>

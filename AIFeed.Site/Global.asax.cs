@@ -21,7 +21,11 @@ namespace AIFeedStat
         public static int PercentageOfRepliedThreads { get; private set; }
         public static int PercentageOfAcceptedAsAnswerThreads { get; private set; }
         public static int TotalThreads { get; set; }
+        public static IEnumerable<string> UnRepliedThreads { get; set; }
+
+        public static IEnumerable<string> UnAnsweredThreads { get; set; }
         
+
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
@@ -50,6 +54,9 @@ namespace AIFeedStat
             userScore.Process();
             UserScore = userScore.UserScoreList;
 
+
+            UnRepliedThreads = ForumThreads.Where<ForumThreadEntity>(thread => !thread.HasReplies).Select((thread) => thread.Path);
+            UnAnsweredThreads = ForumThreads.Where<ForumThreadEntity>(thread => !thread.IsAnswerAccepted).Select((thread) => thread.Path);
             int repliedCount = ForumThreads.Count((thread) => thread.HasReplies);
             int answeredCount = ForumThreads.Count((thread) => thread.IsAnswerAccepted);
             

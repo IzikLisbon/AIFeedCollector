@@ -13,8 +13,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 namespace AIFeedStat.Controllers
 {
     public class HomeController : Controller
-    {   
-     
+    {
         public ActionResult Dashboard()
         {
             ViewBag.RepliedPercentage = MvcApplication.PercentageOfRepliedThreads;
@@ -82,5 +81,12 @@ namespace AIFeedStat.Controllers
             return View();
         }
 
+        public ActionResult UnReplied()
+        {
+            ViewBag.UnRepliedThreads = MvcApplication.UnRepliedThreads;
+            ViewBag.UnAnsweredThreads = MvcApplication.UnAnsweredThreads;
+
+            return View();
+        }
     }
 }
