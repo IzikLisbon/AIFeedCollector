@@ -28,7 +28,8 @@ namespace AIStoreCollection
             foreach (rssItem item in aiRss.channel.items)
             {
                 int guidIndex = item.link.IndexOf("en-US/") + "en-US/".Length;
-                string uri = string.Format("https://social.msdn.microsoft.com/Forums/en-US/ApplicationInsights/thread/{0}?outputAs=rss", item.link.Substring(guidIndex, guidLength));
+                string id = item.link.Substring(guidIndex, guidLength);
+                string uri = string.Format("https://social.msdn.microsoft.com/Forums/en-US/ApplicationInsights/thread/{0}?outputAs=rss", id);
 
                 Task<rss> rssTask = ReadRss(uri);
                 Task<string> htmlTask = ReadHtml(item.link);

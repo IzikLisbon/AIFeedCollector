@@ -12,6 +12,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 
 namespace AIFeedStat.Controllers
 {
+    [OutputCache(NoStore = true, Duration = 0, VaryByParam = "None")]
     public class HomeController : Controller
     {
         public static bool running = false;
