@@ -3,12 +3,12 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 using AIStoreCollection;
-using AIStoreCollection.HtmlModel;
 using AIFeed.AzureTableStorageEntities;
 using Microsoft.Azure.WebJobs;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
-using AIRssCollection;
+using AIRssCollection.MSDN;
+using AIFeedCommon.StackOverflowCollector;
 
 namespace AIFeedCollector.WebJobs
 {
@@ -24,22 +24,23 @@ namespace AIFeedCollector.WebJobs
         public static void IterateOverExistingFeeds(
             [Table("ForumThreadsSummery")] CloudTable cloudTable)
         {
-            FeedsCollector.IterateOverExistingFeeds(cloudTable);
+            MSDNFeedCollector.IterateOverExistingFeeds(cloudTable);
         }
 
         [NoAutomaticTrigger]
         public static void IterateOverRss(
             [Table("ForumThreadsSummery")] CloudTable cloudTable)
-        {   
-            FeedsCollector.IterateOverRss(cloudTable);
+        {
+            MSDNFeedCollector.IterateOverRss(cloudTable);
         }
 
         [NoAutomaticTrigger]
         public static void IterateOverRssAndExisingFeeds(
             [Table("ForumThreadsSummery")] CloudTable cloudTable)
         {
-            FeedsCollector.IterateOverExistingFeeds(cloudTable);
-            FeedsCollector.IterateOverRss(cloudTable);
+            StackOverflowCollector.IterateOverQuestionsFromApplicationInsightsTag(cloudTable);
+            //MSDNFeedCollector.IterateOverExistingFeeds(cloudTable);
+            //MSDNFeedCollector.IterateOverRss(cloudTable);
         }
     }
 }

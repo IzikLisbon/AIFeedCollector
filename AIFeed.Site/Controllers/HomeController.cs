@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using AIRssCollection.MSDN;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
@@ -67,10 +68,10 @@ namespace AIFeedStat.Controllers
                         // // Iterate and update 
                         if (all)
                         {
-                            AIRssCollection.FeedsCollector.IterateOverExistingFeeds(table);
+                            MSDNFeedCollector.IterateOverExistingFeeds(table);
                         }
 
-                        AIRssCollection.FeedsCollector.IterateOverRss(table);
+                        MSDNFeedCollector.IterateOverRss(table);
                         MvcApplication.RefreshFromStorage(table);
                     }
                     catch (Exception e)

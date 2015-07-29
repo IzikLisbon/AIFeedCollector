@@ -22,7 +22,7 @@ namespace AIFeedStat.StatisticsCalculators
                 List<ReplyEntity> replies = ReplyEntitiesJsonSerializer.Deserialize(forumThreadEntity.Replies);
                 foreach (ReplyEntity reply in replies)
                 {
-                    if (!reply.IsAuthorMicrosoftEmploee)
+                    if (!reply.IsAuthorMicrosoftEmploee.HasValue || !reply.IsAuthorMicrosoftEmploee.Value)
                     {
                         continue;
                     }
