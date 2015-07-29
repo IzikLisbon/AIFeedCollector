@@ -19,7 +19,9 @@ namespace AIFeedStat.Controllers
             ViewBag.RepliedPercentage = DataProvider.Instance.PercentageOfRepliedThreads;
             ViewBag.AnsweredPercentage = DataProvider.Instance.PercentageOfAcceptedAsAnswerThreads;
             ViewBag.TotalThreads = DataProvider.Instance.TotalThreads;
-            ViewBag.Reloading = Running;
+            ViewBag.Reloading = DataProvider.Instance.Running;
+            ViewBag.ShowLastReloadTime = DataProvider.Instance.LatestRefreshTime.HasValue;
+            ViewBag.LastReloadTime = DataProvider.Instance.LatestRefreshTime;
 
             return View();
         }
@@ -39,38 +41,27 @@ namespace AIFeedStat.Controllers
             return Content(content);
         }
 
-        public ActionResult ReloadData()
+        public EmptyResult ReloadData()
         {
-            lock (this)
+            Task.Run(() => DataProvider.Instance.RefreshFromStorage(DataProvider.Instance.CloudTable, true));
+            return new EmptyResult();
+        }
+
+        public JsonResult IsRefreshing()
+        {
+            string date = "unknown";
+            if (DataProvider.Instance.LatestRefreshTime.HasValue)
             {
-                if (Running)
-                {
-                    return View();
-                }
-                
-                Running = true;
-                LastRunTime = DateTime.Now;
+                date = DataProvider.Instance.LatestRefreshTime.Value.ToString("dd MMM yyyy hh:mm:ss");
             }
 
-            Task.Run(
-                () =>
-                {   
-                    try
-                    {
-                        DataProvider.Instance.RefreshFromStorage(DataProvider.Instance.CloudTable, true);
-                    }
-                    catch (Exception e)
-                    {
-                        // do nothing
-                    }
-                    finally
-                    {
-                        Running = false;
-                    }
-                }
-            );
-
-            return View();
+            return Json(
+                new 
+                {
+                    running = DataProvider.Instance.Running,
+                    lastRunTime = date
+                }, 
+                JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult UnReplied()

@@ -25,14 +25,29 @@
                 @Html.ActionLink("Threads with no replies or unanswered replies", "UnReplied", "Home")
             </td>
             <td style="text-align: left">
-                <div style="font-size: 1.5em">Collection start date:</div>
-                <div style="font-size: 1.7em; font-weight: 600">June 1<sup>st</sup> 2015</div>
+                <div class="infoTitle">Collection start date:</div>
+                <div class="infoValue">June 1<sup>st</sup> 2015</div>
 
                 <br /><br />
 
-                <div style="font-size: 1.5em">Total Threads: </div>
-                <div style="font-size: 1.7em; font-weight: 600">@ViewBag.TotalThreads</div>
-            </td>
+                <div class="infoTitle">Total Threads: </div>
+                <div class="infoValue">@ViewBag.TotalThreads</div>
+
+                <br /><br />
+
+                @if (ViewBag.ShowLastReloadTime)
+                {
+                <div class="infoTitle">Latest Refreshed Time: </div>
+                <div class="infoValue" id="lastReloadTimeLabel">@ViewBag.LastReloadTime.ToString("dd MMM yyyy hh:mm:ss")</div>
+                }
+                
+                <br /><br />
+
+                <div id='reloadingLabel' style="display: none"><img src="~/Content/Images/Loading.gif" /></div>
+                <a href="#" id="refreshLink" style="display: none">
+                    <img class="refreshButton" alt="Refreshes the data from all the sources (Stackoverflow, MSDN,...) - may take few minutes." src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAADpUlEQVRoQ+1ZXVIaQRD+ekz0MeYE4UEhb3KD4Ank5wAZTyCcQDyBcIKMB4DFE4gnCL4FTJXkBDGPkridatzFhVqWXXakEmv3hSp2pru/7p7u6W8Jr+ShV4IDGZB/LZJZRF59RPYdXSSmAxDn4KJIhF0ftMsYKIWxC1zfVszApjOspNZHR+ceXZwQQROeDV9h6Nhl9LYU2t8qZhy2dq97/Mn//w/xzbhi7pfJTAVEADDjC4BSGu8yo6cUGouACl3NvtxHwuH3iulbB5J39CkxmmGCGbghoM+MeQ8ScgCKBByE7iM0RxVz5r97USA5R+/uMJzFKIjxzGj9VuhFpYAYKTLeuigroAnChwVQ/QdCRWS8GBAxYJtxRUBxppzxgxXqo4rprZNe+x0t56pFhHf+fgYGE8LhDuOn9dQKA8HAxYRQXxWBVQA92YaAoyCYoMOsnZFCV1/NpROjMayZ1iojk7zPd7WA+Ry2xwqQQkfXQTgPKGgPq6aexMi4a5eBSQ1ESqzL+Or3BwYuR1VTjmtY1Dppnsw0Oxv+WgVuzZ1DAKmBBD3EjF8ThVzaMxEor9IXZk0vCnQqIF7DuwtcMY5va8bYiIbIKHT1ZoBMq4kLOQt1Au6HNSMNzdpT6GopFs+lPEKyS6hH3c9iX1EkOsvuRNaQpRAUG0gKHRvZmgHZiJsTKMkiksBZG1maRWQjbk6gJItIAmdtZGkWkU24Ocm1KDIiMi8onhuoouy/sT1sFbr6joUnI7QmQHttXmvP0aUthoy4cZ7rYdWk4reCSoSUUDTlzKbPA+H9fwfEIyPuAlPpxahqdJQ3I1MrLCIM3IPRXhTKwNjW0JXvaIcI03FaplKlUFw1QiQG4gk/G9VMKMsYJwej1njD1slsTUy2Zi0gosRltG5rppHW8OD+gqNPwAhSTLHPXSIgHqc7422FfJ4oHKclI7yR+lzYfB+Y6JoQSnFlJwIilWOb0V8gocdMaKxLmeYdXaanEj/jA5KCEPCJgAyrhjwSW3jeRRpnzKDmhPhylRefqhIdASykxhz5ILzZhKBXyVhM6cRAfAH5jm4S4TTsjAgJDcYACnMfcNjFLhFKi8b71QlAa90isjYQUe6xkM1lfG3cQiBRUIT6qhK7dh+RFHgTCP2yL0YekVcHoxzyvSNUv/QHIhgitNIA8IVbv/3K/Uw+giqa5v4s/6VhgjGW3y2Fvg3jgx6yDiRuOtlelwGx7dG08rKIpPWg7f2vJiJ/Ab+es0IRXA52AAAAAElFTkSuQmCC" width="50" height="50">
+                </a>
+             </td>
         </tr>
         </table>
         <table>
@@ -48,6 +63,22 @@
     <script src="~/bundles/jquery"></script>
     <script src="~/scripts/loadUserScoreBar.js"></script>
     <script src="~/scripts/liquidFillGauge.js"></script>
+    <script src="~/scripts/Views/Dashboard.js"></script>
+
+    <script type="text/javascript">
+        var refreshUrl = '@Url.Action("ReloadData", "Home")';
+        var isRefreshingUrl = '@Url.Action("IsRefreshing", "Home")';
+        var reloading = @Json.Encode(ViewBag.Reloading);
+
+        var refreshManager = new RefreshManager(refreshUrl, isRefreshingUrl);
+        refreshManager.toggleReloading(reloading);
+        if (reloading)
+        {
+            refreshManager.checkRefreshingStatusPeriodically();
+        }
+    </script>
+
+
 
     <script language="JavaScript">
         loadLiquidFillGauge("repliedThreads", @ViewBag.RepliedPercentage);

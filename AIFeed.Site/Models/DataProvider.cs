@@ -30,6 +30,7 @@ namespace AIFeedStat.Models
         private DataProvider() 
         {
             this.CloudTable = GetCloudTable();
+            this.Running = false;
         }
 
         public IReadOnlyList<ForumThreadEntity> ForumThreads { get; private set; }
@@ -39,6 +40,8 @@ namespace AIFeedStat.Models
         public int TotalThreads { get; set; }
         public IEnumerable<string> UnRepliedThreads { get; set; }
         public IEnumerable<string> UnAnsweredThreads { get; set; }
+        public DateTime? LatestRefreshTime { get; set; }
+        public bool Running { get; set; }
 
         /// <summary>
         /// Refreshes all the static fields (UnRepliedThreads, UnAnsweredThreads, repliedCount...) from Storage. 
@@ -46,27 +49,46 @@ namespace AIFeedStat.Models
         /// </summary>
         public void RefreshFromStorage(CloudTable table, bool refreshStorageFromSources)
         {
-            if (refreshStorageFromSources)
+            // if already running - quit.
+            lock (this)
             {
-                MSDNFeedCollector.IterateOverExistingFeeds(table);
-                MSDNFeedCollector.IterateOverRss(table);
-                StackOverflowCollector.IterateOverQuestionsWithApplicationInsightsTag(table);
+                if (this.Running)
+                {
+                    return;
+                }
+
+                Running = true;
             }
 
-            this.ForumThreads = table.CreateQuery<ForumThreadEntity>().ToList();
+            try
+            {
+                if (refreshStorageFromSources)
+                {
+                    MSDNFeedCollector.IterateOverExistingFeeds(table);
+                    MSDNFeedCollector.IterateOverRss(table);
+                    StackOverflowCollector.IterateOverQuestionsWithApplicationInsightsTag(table);
+                }
 
-            ProcessUserScore userScore = new ProcessUserScore(ForumThreads);
-            userScore.Process();
-            this.UserScore = userScore.UserScoreList;
+                this.ForumThreads = table.CreateQuery<ForumThreadEntity>().ToList();
 
-            this.UnRepliedThreads = this.ForumThreads.Where<ForumThreadEntity>(thread => !thread.HasReplies).Select((thread) => thread.Path);
-            this.UnAnsweredThreads = this.ForumThreads.Where<ForumThreadEntity>(thread => !thread.IsAnswerAccepted).Select((thread) => thread.Path);
-            int repliedCount = this.ForumThreads.Count((thread) => thread.HasReplies);
-            int answeredCount = this.ForumThreads.Count((thread) => thread.IsAnswerAccepted);
+                ProcessUserScore userScore = new ProcessUserScore(ForumThreads);
+                userScore.Process();
+                this.UserScore = userScore.UserScoreList;
 
-            this.PercentageOfRepliedThreads = (int)(((double)repliedCount / (double)this.ForumThreads.Count) * 100);
-            this.PercentageOfAcceptedAsAnswerThreads = (int)(((double)answeredCount / (double)this.ForumThreads.Count) * 100);
-            this.TotalThreads = this.ForumThreads.Count();
+                this.UnRepliedThreads = this.ForumThreads.Where<ForumThreadEntity>(thread => !thread.HasReplies).Select((thread) => thread.Path);
+                this.UnAnsweredThreads = this.ForumThreads.Where<ForumThreadEntity>(thread => !thread.IsAnswerAccepted).Select((thread) => thread.Path);
+                int repliedCount = this.ForumThreads.Count((thread) => thread.HasReplies);
+                int answeredCount = this.ForumThreads.Count((thread) => thread.IsAnswerAccepted);
+
+                this.PercentageOfRepliedThreads = (int)(((double)repliedCount / (double)this.ForumThreads.Count) * 100);
+                this.PercentageOfAcceptedAsAnswerThreads = (int)(((double)answeredCount / (double)this.ForumThreads.Count) * 100);
+                this.TotalThreads = this.ForumThreads.Count();
+                LatestRefreshTime = DateTime.Now;
+            }
+            finally
+            {
+                this.Running = false;
+            }
         }
 
         /// <summary>
