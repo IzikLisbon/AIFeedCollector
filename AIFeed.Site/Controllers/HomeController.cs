@@ -14,7 +14,6 @@ namespace AIFeedStat.Controllers
         public static bool Running = false;
         private DateTime LastRunTime = DateTime.Now;
 
-        [NoCache]
         public ActionResult Dashboard()
         {
             ViewBag.RepliedPercentage = DataProvider.Instance.PercentageOfRepliedThreads;
