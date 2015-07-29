@@ -67,8 +67,8 @@ namespace AIFeedCommon.StackOverflowCollector
                 threadEntity.Id = threadEntity.RowKey;
                 threadEntity.HasReplies = stackOverflowQuestion.answer_count > 0;
                 threadEntity.IsAnswerAccepted = stackOverflowQuestion.is_answered;
-                threadEntity.LastUpdated = UnixTimeStampToDateTime(stackOverflowQuestion.last_activity_date).ToShortDateString();
-                threadEntity.PostedOn = UnixTimeStampToDateTime(stackOverflowQuestion.creation_date).ToShortDateString();
+                threadEntity.LastUpdated = UnixTimeStampToDateTime(stackOverflowQuestion.last_activity_date);
+                threadEntity.PostedOn = UnixTimeStampToDateTime(stackOverflowQuestion.creation_date);
                 threadEntity.Path = stackOverflowQuestion.link;
                 threadEntity.Replies = await RepliesToJson(stackOverflowQuestion.question_id);
                 threadEntity.Source = "StackOverflow";
@@ -123,12 +123,12 @@ namespace AIFeedCommon.StackOverflowCollector
             return ReplyEntitiesJsonSerializer.Serialize(replies);
         }
 
-        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        public static string UnixTimeStampToDateTime(double unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
             System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime;
+            return dtDateTime.ToString("ddd, dd MMM yyyy hh:mm:ss Z");
         }
     }
 }

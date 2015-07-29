@@ -1,28 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
-using AIRssCollection.MSDN;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+using AIFeedStat.Models;
 
 namespace AIFeedStat.Controllers
 {
     [OutputCache(NoStore = true, Duration = 0, VaryByParam = "None")]
     public class HomeController : Controller
     {
-        public static bool running = false;
+        public static bool Running = false;
+        private DateTime LastRunTime = DateTime.Now;
 
         public ActionResult Dashboard()
         {
-            ViewBag.RepliedPercentage = MvcApplication.PercentageOfRepliedThreads;
-            ViewBag.AnsweredPercentage = MvcApplication.PercentageOfAcceptedAsAnswerThreads;
-            ViewBag.TotalThreads = MvcApplication.TotalThreads;
+            ViewBag.RepliedPercentage = DataProvider.Instance.PercentageOfRepliedThreads;
+            ViewBag.AnsweredPercentage = DataProvider.Instance.PercentageOfAcceptedAsAnswerThreads;
+            ViewBag.TotalThreads = DataProvider.Instance.TotalThreads;
+            ViewBag.Reloading = Running;
 
             return View();
         }
@@ -33,7 +30,7 @@ namespace AIFeedStat.Controllers
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("authorName\tscore");
 
-            foreach (var userScore in MvcApplication.UserScore.OrderByDescending((userScore) => userScore.Score).Take(8))
+            foreach (var userScore in DataProvider.Instance.UserScore.OrderByDescending((userScore) => userScore.Score).Take(8))
             {
                 sb.AppendLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}", userScore.AuthorName, userScore.Score));
             }
@@ -42,16 +39,17 @@ namespace AIFeedStat.Controllers
             return Content(content);
         }
 
-        public ActionResult ReloadData(bool all=false)
+        public ActionResult ReloadData()
         {
             lock (this)
             {
-                if (running)
+                if (Running)
                 {
                     return View();
                 }
                 
-                running = true;
+                Running = true;
+                LastRunTime = DateTime.Now;
             }
 
             Task.Run(
@@ -59,20 +57,7 @@ namespace AIFeedStat.Controllers
                 {   
                     try
                     {
-                        // Get CloudTable
-                        string webJobStorageConnectionString = ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ToString();
-                        CloudStorageAccount account = CloudStorageAccount.Parse(webJobStorageConnectionString);
-                        CloudTableClient tableClient = account.CreateCloudTableClient();
-                        CloudTable table = tableClient.GetTableReference("ForumThreadsSummery");
-
-                        // // Iterate and update 
-                        if (all)
-                        {
-                            MSDNFeedCollector.IterateOverExistingFeeds(table);
-                        }
-
-                        MSDNFeedCollector.IterateOverRss(table);
-                        MvcApplication.RefreshFromStorage(table);
+                        DataProvider.Instance.RefreshFromStorage(DataProvider.Instance.CloudTable, true);
                     }
                     catch (Exception e)
                     {
@@ -80,7 +65,7 @@ namespace AIFeedStat.Controllers
                     }
                     finally
                     {
-                        running = false;
+                        Running = false;
                     }
                 }
             );
@@ -90,8 +75,8 @@ namespace AIFeedStat.Controllers
 
         public ActionResult UnReplied()
         {
-            ViewBag.UnRepliedThreads = MvcApplication.UnRepliedThreads;
-            ViewBag.UnAnsweredThreads = MvcApplication.UnAnsweredThreads;
+            ViewBag.UnRepliedThreads = DataProvider.Instance.UnRepliedThreads;
+            ViewBag.UnAnsweredThreads = DataProvider.Instance.UnAnsweredThreads;
 
             return View();
         }

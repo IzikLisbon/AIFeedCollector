@@ -17,7 +17,8 @@ namespace AIFeedCollector.WebJobs
         static void Main(string[] args)
         {   
             JobHost host = new JobHost();
-            host.Call(typeof(Program).GetMethod("IterateOverRssAndExisingFeeds"));
+            // Currently do nothing. Changed the design to refresh data from the site itself and not from a webjob.
+            //host.Call(typeof(Program).GetMethod("IterateOverRssAndExisingFeeds"));
         }
 
         [NoAutomaticTrigger]
