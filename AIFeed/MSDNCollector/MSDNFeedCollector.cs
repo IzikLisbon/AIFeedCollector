@@ -1,58 +1,15 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Json;
-using AIStoreCollection;
-using AIStoreCollection.HtmlModel;
-using AIFeed.AzureTableStorageEntities;
-using Microsoft.WindowsAzure.Storage.Table;
-using System;
-using Microsoft.WindowsAzure.Storage;
-
-namespace AIRssCollection
+﻿namespace AIRssCollection.MSDN
 {
-    public class FeedsCollector
+    using System.Collections.Generic;
+    using System.Linq;
+    using AIFeed.AzureTableStorageEntities;
+    using AIStoreCollection;
+    using AIStoreCollection.MSDN;
+    using AIStoreCollection.MSDN.HtmlModel;
+    using Microsoft.WindowsAzure.Storage.Table;
+
+    public class MSDNFeedCollector
     {
-        /// <summary>
-        /// Copy from one Azure Table to anohter
-        /// </summary>
-        /// <param name="oldConnectionString">Connection string to the older Azure table</param>
-        /// <param name="cloudTable">CloudTable that points to the new table</param>
-        public static void CopyToAnotherCloudTable(string oldConnectionString, CloudTable cloudTable)
-        {
-            // Open storage account using credentials from .cscfg file.
-            // string webJobStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=airsscollector;AccountKey=n5OFL64RLztYbW0wx45jXfblYxNt414trgOdGVjjMVrcFSn8g/cpyZoDqPez2/qBpV9aLgBXkc2Z7a3sEHSFcg==";
-            CloudStorageAccount account = CloudStorageAccount.Parse(oldConnectionString);
-
-            // Create the table client. 
-            CloudTableClient tableClient = account.CreateCloudTableClient();
-
-            // Create the table if it doesn't exist. 
-            CloudTable oldTable = tableClient.GetTableReference("ForumThreadsSummery");
-
-
-            var query = new TableQuery<ForumThreadEntity>();
-            IEnumerable<ForumThreadEntity> list = oldTable.ExecuteQuery(query);
-
-            foreach (ForumThreadEntity forumThread in list)
-            {
-                ForumThreadEntity newForumThreadEntity = new ForumThreadEntity();
-                newForumThreadEntity.PartitionKey = forumThread.PartitionKey;
-                newForumThreadEntity.RowKey = forumThread.RowKey;
-                newForumThreadEntity.HasReplies = forumThread.HasReplies;
-                newForumThreadEntity.Id = forumThread.Id;
-                newForumThreadEntity.IsAnswerAccepted = forumThread.IsAnswerAccepted;
-                newForumThreadEntity.LastUpdated = forumThread.LastUpdated;
-                newForumThreadEntity.Path = forumThread.Path;
-                newForumThreadEntity.PostedOn = forumThread.PostedOn;
-                newForumThreadEntity.Replies = forumThread.Replies;
-
-                TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(newForumThreadEntity);
-                TableResult res = cloudTable.Execute(insertOrReplaceOperation);
-                System.Console.WriteLine(res.HttpStatusCode);
-            }
-        }
-
         /// <summary>
         /// Going over all the collected AI feeds and update thier statistics (by parsing the HTML) 
         /// </summary>
@@ -140,6 +97,7 @@ namespace AIRssCollection
                 threadEntity.PostedOn = thread.Rss.channel.items.First().pubDate;
                 threadEntity.Path = thread.Rss.channel.link.href;
                 threadEntity.Replies = RepliesToJson(thread.htmlModel.Replies); ;
+                threadEntity.Source = "MSDN";
 
                 threadsTable.Add(threadEntity);
             }

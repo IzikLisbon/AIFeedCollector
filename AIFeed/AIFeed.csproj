@@ -68,24 +68,34 @@
     <Compile Include="AzureTableStorageEntities\ForumThreadEntity.cs" />
     <Compile Include="AzureTableStorageEntities\ReplyEntity.cs" />
     <Compile Include="AzureTableStorageEntities\ReplyEntityJsonSerializer.cs" />
-    <Compile Include="DownloadAndParse.cs" />
-    <Compile Include="HtmlModel\HtmlReply.cs" />
-    <Compile Include="HtmlModel\HtmlThread.cs" />
-    <Compile Include="ProcessKeywords.cs" />
-    <Compile Include="FeedsCollector.cs" />
+    <Compile Include="MSDNCollector\DownloadAndParse.cs" />
+    <Compile Include="MSDNCollector\HtmlModel\HtmlReply.cs" />
+    <Compile Include="MSDNCollector\HtmlModel\HtmlThread.cs" />
+    <Compile Include="MSDNCollector\MSDNFeedCollector.cs" />
+    <Compile Include="StackOverflowCollector\GzipWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StackOverflowCollector\Model\Answer.cs" />
+    <Compile Include="StackOverflowCollector\Model\Question.cs" />
+    <Compile Include="StackOverflowCollector\Model\Root.cs" />
+    <Compile Include="StackOverflowCollector\Model\Owner.cs" />
+    <Compile Include="StackOverflowCollector\StackOverflowCollector.cs" />
+    <Compile Include="_not_used\ProcessKeywords.cs" />
+    <Compile Include="AzureTableUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RssModel\author.cs" />
-    <Compile Include="RssModel\channel.cs" />
-    <Compile Include="RssModel\enclosure.cs" />
-    <Compile Include="RssModel\item.cs" />
-    <Compile Include="RssModel\link.cs" />
-    <Compile Include="RssModel\rss.cs" />
-    <Compile Include="Team.cs" />
-    <Compile Include="ThreadInfo.cs" />
+    <Compile Include="MSDNCollector\RssModel\author.cs" />
+    <Compile Include="MSDNCollector\RssModel\channel.cs" />
+    <Compile Include="MSDNCollector\RssModel\enclosure.cs" />
+    <Compile Include="MSDNCollector\RssModel\item.cs" />
+    <Compile Include="MSDNCollector\RssModel\link.cs" />
+    <Compile Include="MSDNCollector\RssModel\rss.cs" />
+    <Compile Include="_not_used\Team.cs" />
+    <Compile Include="MSDNCollector\ThreadInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

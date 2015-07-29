@@ -1,4 +1,8 @@
-﻿using System;
+﻿//
+// NOT USED!!! Future Work.
+//
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace AIStoreCollection
 {
-    class ProcessKeywords
+    
+    class NOTUSED_ProcessKeywords
     {
         static Dictionary<Team, rssItem> RssPerTeam { get; set; }
         static Dictionary<Team, List<string>> teamKeywords =

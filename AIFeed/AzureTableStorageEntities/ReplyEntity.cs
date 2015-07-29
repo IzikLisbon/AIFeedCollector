@@ -15,7 +15,7 @@ namespace AIFeed.AzureTableStorageEntities
         [DataMember]
         public string AuthorName { get; set; }
         [DataMember]
-        public bool IsAuthorMicrosoftEmploee { get; set; }
+        public bool? IsAuthorMicrosoftEmploee { get; set; }
         [DataMember]
         public int VoteUps { get; set; }
         [DataMember]

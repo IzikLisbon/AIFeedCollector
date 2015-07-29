@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AIStoreCollection.HtmlModel
+namespace AIStoreCollection.MSDN.HtmlModel
 {
-    public class HtmlThread
+    internal class HtmlThread
     {
-        public HtmlThread()
+        internal HtmlThread()
         {
             Replies = new List<HtmlReply>();
         }
 
-        public List<HtmlReply> Replies { get; set; } 
+        internal List<HtmlReply> Replies { get; set; } 
     }
 }

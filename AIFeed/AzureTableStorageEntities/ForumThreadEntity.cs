@@ -14,6 +14,10 @@ namespace AIFeed.AzureTableStorageEntities
         /// String is a list json-serialized ReplyEntity 
         /// </summary>
         public string Replies { get; set; }
+        /// <summary>
+        /// StackOverflow, MSDN, Twitter...
+        /// </summary>
+        public string Source { get; set; }
         public bool HasReplies { get; set; }
         public bool IsAnswerAccepted { get; set; }
         public string PostedOn { get; set; }

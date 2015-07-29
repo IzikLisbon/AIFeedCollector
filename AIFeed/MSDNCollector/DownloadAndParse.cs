@@ -7,19 +7,19 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using AIStoreCollection.HtmlModel;
+using AIStoreCollection.MSDN.HtmlModel;
 using HtmlAgilityPack;
 
-namespace AIStoreCollection
+namespace AIStoreCollection.MSDN
 {
-    public class DownloadAndParse
+    internal class DownloadAndParse
     {
         const int guidLength = 36;
 
         /// <summary>
         /// Collect data for all threads. For every thread collect its RSS and HTML. 
         /// </summary>
-        public async static Task<List<ThreadInfo>> StartAsync()
+        internal async static Task<List<ThreadInfo>> StartAsync()
         {
             List<ThreadInfo> threadList = new List<ThreadInfo>();
             rss aiRss = await ReadRss("https://social.msdn.microsoft.com/Forums/en-US/ApplicationInsights/threads?outputAs=rss").ConfigureAwait(false);
@@ -51,7 +51,7 @@ namespace AIStoreCollection
         /// <summary>
         /// Downlaod the HTML from the url and parse it into an HtmlThread object.
         /// </summary>
-        public static HtmlThread ParseHtmlOnly(string url)
+        internal static HtmlThread ParseHtmlOnly(string url)
         {
             string html = ReadHtml(url).GetAwaiter().GetResult();
             HtmlThread htmlThread = ParseHtml(html);
