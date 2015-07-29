@@ -38,9 +38,9 @@ namespace AIFeedCollector.WebJobs
         public static void IterateOverRssAndExisingFeeds(
             [Table("ForumThreadsSummery")] CloudTable cloudTable)
         {
-            StackOverflowCollector.IterateOverQuestionsFromApplicationInsightsTag(cloudTable);
-            //MSDNFeedCollector.IterateOverExistingFeeds(cloudTable);
-            //MSDNFeedCollector.IterateOverRss(cloudTable);
+            StackOverflowCollector.IterateOverQuestionsWithApplicationInsightsTag(cloudTable);
+            MSDNFeedCollector.IterateOverExistingFeeds(cloudTable);
+            MSDNFeedCollector.IterateOverRss(cloudTable);
         }
     }
 }

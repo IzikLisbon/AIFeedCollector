@@ -10,6 +10,8 @@
 
     public class MSDNFeedCollector
     {
+        public const string MSDNSource = "MSDN";
+
         /// <summary>
         /// Going over all the collected AI feeds and update thier statistics (by parsing the HTML) 
         /// </summary>
@@ -26,14 +28,17 @@
 
             foreach (ForumThreadEntity forumThread in list)
             {
-                HtmlThread htmlThread = DownloadAndParse.ParseHtmlOnly(forumThread.Path);
-                forumThread.HasReplies = htmlThread.Replies.Count > 0;
-                forumThread.IsAnswerAccepted = htmlThread.Replies.Any((reply) => reply.MarkedAsAnswer);
-                forumThread.Replies = RepliesToJson(htmlThread.Replies);
+                if (forumThread.Source == MSDNSource)
+                {
+                    HtmlThread htmlThread = DownloadAndParse.ParseHtmlOnly(forumThread.Path);
+                    forumThread.HasReplies = htmlThread.Replies.Count > 0;
+                    forumThread.IsAnswerAccepted = htmlThread.Replies.Any((reply) => reply.MarkedAsAnswer);
+                    forumThread.Replies = RepliesToJson(htmlThread.Replies);
 
-                TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(forumThread);
-                TableResult res = cloudTable.Execute(insertOrReplaceOperation);
-                System.Console.WriteLine(res.HttpStatusCode);
+                    TableOperation insertOrReplaceOperation = TableOperation.InsertOrReplace(forumThread);
+                    TableResult res = cloudTable.Execute(insertOrReplaceOperation);
+                    System.Console.WriteLine(res.HttpStatusCode);
+                }
             }
         }
 
@@ -97,7 +102,7 @@
                 threadEntity.PostedOn = thread.Rss.channel.items.First().pubDate;
                 threadEntity.Path = thread.Rss.channel.link.href;
                 threadEntity.Replies = RepliesToJson(thread.htmlModel.Replies); ;
-                threadEntity.Source = "MSDN";
+                threadEntity.Source = MSDNSource;
 
                 threadsTable.Add(threadEntity);
             }
