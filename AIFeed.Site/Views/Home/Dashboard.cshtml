@@ -38,7 +38,7 @@
                 @if (ViewBag.ShowLastReloadTime)
                 {
                 <div class="infoTitle">Latest Refreshed Time: </div>
-                <div class="infoValue" id="lastReloadTimeLabel">@ViewBag.LastReloadTime.ToString("dd MMM yyyy hh:mm:ss")</div>
+                <div class="infoValue" id="lastReloadTimeLabel">@ViewBag.LastReloadTime.ToLocalTime().ToString("dd MMM yyyy hh:mm:ss")</div>
                 }
                 
                 <br /><br />

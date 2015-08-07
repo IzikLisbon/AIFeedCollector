@@ -47,5 +47,14 @@
                 System.Console.WriteLine(res.HttpStatusCode);
             }
         }
+
+        public static CloudTable GetCloudTable(string connectionStrig, string tableName = "ForumThreadsSummery")
+        {
+            CloudStorageAccount account = CloudStorageAccount.Parse(connectionStrig);
+            CloudTableClient tableClient = account.CreateCloudTableClient();
+            CloudTable table = tableClient.GetTableReference(tableName);
+
+            return table;
+        }
     }
 }

@@ -1,16 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6D11E92C-A584-4BC0-B2BA-01E78F0FDA34}</ProjectGuid>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4D2F914A-DDAF-48C7-98A1-F14CCAFED84B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AIFeedCommon</RootNamespace>
-    <AssemblyName>AIFeedCommon</AssemblyName>
+    <RootNamespace>AIFeed.WorkerRoleWithSBQueue</RootNamespace>
+    <AssemblyName>AIFeed.WorkerRoleWithSBQueue</AssemblyName>
+    <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <RoleType>Worker</RoleType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,17 +32,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HtmlAgilityPack">
-      <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net45\HtmlAgilityPack.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Data.Edm, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Data.Edm.5.6.2\lib\net40\Microsoft.Data.Edm.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Data.OData, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Data.OData.5.6.2\lib\net40\Microsoft.Data.OData.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Data.Services.Client, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.Data.Services.Client.5.6.2\lib\net40\Microsoft.Data.Services.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.ServiceBus">
+      <HintPath>..\packages\WindowsAzure.ServiceBus.2.7.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.1.8.0.0\lib\net35-full\Microsoft.WindowsAzure.Configuration.dll</HintPath>
@@ -53,53 +59,37 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Spatial, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\System.Spatial.5.6.2\lib\net40\System.Spatial.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=2.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAzure.Diagnostics, Version=2.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AzureTableStorageEntities\ForumThreadEntity.cs" />
-    <Compile Include="AzureTableStorageEntities\RefreshInfo.cs" />
-    <Compile Include="AzureTableStorageEntities\ReplyEntity.cs" />
-    <Compile Include="AzureTableStorageEntities\ReplyEntityJsonSerializer.cs" />
-    <Compile Include="MSDNCollector\DownloadAndParse.cs" />
-    <Compile Include="MSDNCollector\HtmlModel\HtmlReply.cs" />
-    <Compile Include="MSDNCollector\HtmlModel\HtmlThread.cs" />
-    <Compile Include="MSDNCollector\MSDNFeedCollector.cs" />
-    <Compile Include="RefreshManager.cs" />
-    <Compile Include="RefreshMessage.cs" />
-    <Compile Include="StackOverflowCollector\GzipWebClient.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="StackOverflowCollector\Model\Answer.cs" />
-    <Compile Include="StackOverflowCollector\Model\Question.cs" />
-    <Compile Include="StackOverflowCollector\Model\Root.cs" />
-    <Compile Include="StackOverflowCollector\Model\Owner.cs" />
-    <Compile Include="StackOverflowCollector\StackOverflowCollector.cs" />
-    <Compile Include="_not_used\ProcessKeywords.cs" />
-    <Compile Include="AzureTableUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MSDNCollector\RssModel\author.cs" />
-    <Compile Include="MSDNCollector\RssModel\channel.cs" />
-    <Compile Include="MSDNCollector\RssModel\enclosure.cs" />
-    <Compile Include="MSDNCollector\RssModel\item.cs" />
-    <Compile Include="MSDNCollector\RssModel\link.cs" />
-    <Compile Include="MSDNCollector\RssModel\rss.cs" />
-    <Compile Include="_not_used\Team.cs" />
-    <Compile Include="MSDNCollector\ThreadInfo.cs" />
+    <Compile Include="WorkerRole.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\AIFeed\AIFeed.csproj">
+      <Project>{6d11e92c-a584-4bc0-b2ba-01e78f0fda34}</Project>
+      <Name>AIFeed</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

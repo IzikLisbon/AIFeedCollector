@@ -23,6 +23,11 @@ namespace AIFeed.AzureTableStorageEntities
 
         public static List<ReplyEntity> Deserialize(string repliesAsJson)
         {
+            if (string.IsNullOrEmpty(repliesAsJson))
+            {
+                return new List<ReplyEntity>();
+            }
+
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(repliesAsJson));
             DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<ReplyEntity>));
             List<ReplyEntity> replies = (List<ReplyEntity>)ser.ReadObject(stream);

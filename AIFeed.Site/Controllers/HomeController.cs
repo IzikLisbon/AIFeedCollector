@@ -52,7 +52,7 @@ namespace AIFeedStat.Controllers
             string date = "unknown";
             if (DataProvider.Instance.LatestRefreshTime.HasValue)
             {
-                date = DataProvider.Instance.LatestRefreshTime.Value.ToString("dd MMM yyyy hh:mm:ss");
+                date = DataProvider.Instance.LatestRefreshTime.Value.ToLocalTime().ToString("dd MMM yyyy hh:mm:ss");
             }
 
             return Json(
